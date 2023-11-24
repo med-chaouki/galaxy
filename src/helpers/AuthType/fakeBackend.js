@@ -13,6 +13,27 @@ let users = [
   },
 ];
 
+// let users = [];
+// const fetchAndSaveUsers = () => {
+//   axios
+//     .post(`http://127.0.0.1:4000/v1/users/login`)
+//     .then((response) => {
+//       // Handle successful response
+//       users = response.data;
+//       console.log("Users:", users);
+
+//       // Now 'users' array is updated with the data from the API
+//     })
+//     .catch((error) => {
+//       // Handle error
+//       console.error("Error:", error);
+//     });
+// };
+
+// // Call the function to fetch and save users
+// fetchAndSaveUsers();
+// console.log("Users:", users);
+
 const fakeBackend = () => {
   // This sets the mock adapter on the default instance
   const mock = new MockAdapter(axios, { onNoMatch: "passthrough" });
