@@ -1,735 +1,3 @@
-// import React, { useState, useEffect, useMemo, useCallback } from "react";
-// import axios from "axios";
-// import {
-//   Container,
-//   Row,
-//   Col,
-//   Card,
-//   CardHeader,
-//   Modal,
-//   Form,
-//   ModalBody,
-//   ModalFooter,
-//   ModalHeader,
-//   Label,
-//   Input,
-//   FormFeedback,
-// } from "reactstrap";
-
-// import { Link } from "react-router-dom";
-// import Flatpickr from "react-flatpickr";
-// import { isEmpty } from "lodash";
-// import * as moment from "moment";
-
-// // Formik
-// import * as Yup from "yup";
-// import { useFormik } from "formik";
-
-// // Export Modal
-// import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
-
-// //Import Breadcrumb
-// import BreadCrumb from "../../../Components/Common/BreadCrumb";
-// import DeleteModal from "../../../Components/Common/DeleteModal";
-
-// import {
-//   getCustomers as onGetCustomers,
-//   addNewCustomer as onAddNewCustomer,
-//   updateCustomer as onUpdateCustomer,
-//   deleteCustomer as onDeleteCustomer,
-// } from "../../../store/actions";
-
-// //redux
-// import { useSelector, useDispatch } from "react-redux";
-// import TableContainer from "../../../Components/Common/TableContainer";
-
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import Loader from "../../../Components/Common/Loader";
-
-// const EcommerceCustomers = () => {
-//   const dispatch = useDispatch();
-
-//   const { customers, isCustomerCreated, isCustomerSuccess, error } =
-//     useSelector((state) => ({
-//       customers: state.Ecommerce.customers,
-//       isCustomerCreated: state.Ecommerce.isCustomerCreated,
-//       isCustomerSuccess: state.Ecommerce.isCustomerSuccess,
-//       error: state.Ecommerce.error,
-//     }));
-
-//   const [isEdit, setIsEdit] = useState(false);
-//   const [customer, setCustomer] = useState([]);
-
-//   // Delete customer
-//   const [deleteModal, setDeleteModal] = useState(false);
-//   const [deleteModalMulti, setDeleteModalMulti] = useState(false);
-
-//   const [modal, setModal] = useState(false);
-
-//   const toggle = useCallback(() => {
-//     if (modal) {
-//       setModal(false);
-//       setCustomer(null);
-//     } else {
-//       setModal(true);
-//     }
-//   }, [modal]);
-
-//   const customerstatus = [
-//     {
-//       options: [
-//         { label: "Status", value: "Status" },
-//         { label: "All", value: "All" },
-//         { label: "Active", value: "Active" },
-//         { label: "Block", value: "Block" },
-//       ],
-//     },
-//   ];
-
-//   const customermocalstatus = [
-//     {
-//       options: [
-//         { label: "Status", value: "Status" },
-//         { label: "Active", value: "Active" },
-//         { label: "Block", value: "Block" },
-//       ],
-//     },
-//   ];
-
-//   // Delete Data
-//   const onClickDelete = (customer) => {
-//     setCustomer(customer);
-//     setDeleteModal(true);
-//   };
-
-//   // validation
-//   const validation = useFormik({
-//     // enableReinitialize : use this flag when initial values needs to be changed
-//     enableReinitialize: true,
-
-//     initialValues: {
-//       customer: (customer && customer.customer) || "",
-//       email: (customer && customer.email) || "",
-//       phone: (customer && customer.phone) || "",
-//       date: (customer && customer.date) || "",
-//       status: (customer && customer.status) || "",
-//     },
-//     validationSchema: Yup.object({
-//       customer: Yup.string().required("Please Enter Customer Name"),
-//       email: Yup.string().required("Please Enter Your Email"),
-//       phone: Yup.string().required("Please Enter Your Phone"),
-//       status: Yup.string().required("Please Enter Your Status"),
-//     }),
-//     onSubmit: (values) => {
-//       if (isEdit) {
-//         const updateCustomer = {
-//           _id: customer ? customer._id : 0,
-//           customer: values.customer,
-//           email: values.email,
-//           phone: values.phone,
-//           date: date,
-//           status: values.status,
-//         };
-//         // update customer
-//         dispatch(onUpdateCustomer(updateCustomer));
-//         validation.resetForm();
-//       } else {
-//         const newCustomer = {
-//           _id: (Math.floor(Math.random() * (30 - 20)) + 20).toString(),
-//           customer: values["customer"],
-//           email: values["email"],
-//           phone: values["phone"],
-//           date: date,
-//           status: values["status"],
-//         };
-//         // save new customer
-//         dispatch(onAddNewCustomer(newCustomer));
-//         validation.resetForm();
-//       }
-//       toggle();
-//     },
-//   });
-
-//   // Delete Data
-//   const handleDeleteCustomer = () => {
-//     if (customer) {
-//       dispatch(onDeleteCustomer(customer._id));
-//       setDeleteModal(false);
-//     }
-//   };
-
-//   // Update Data
-//   const handleCustomerClick = useCallback(
-//     (arg) => {
-//       const customer = arg;
-//       console.log("customer:", customer);
-//       setCustomer({
-//         _id: customer._id,
-//         active: customer.active,
-//         createdAt: customer.createdAt,
-//         email: customer.email,
-//         firstName: customer.firstName,
-//         lastLogin: customer.lastLogin,
-//         lastName: customer.lastName,
-//         password: customer.password,
-//         updatedAt: customer.updatedAt,
-//         validAccount: customer.validAccount,
-//       });
-
-//       setIsEdit(true);
-//       toggle();
-//     },
-//     [toggle]
-//   );
-
-//   const fetchData = async () => {
-//     try {
-//       const response = await axios.get("http://localhost:4000/v1/customers");
-//       console.log(response.customers);
-//       setCustomer(response.customers);
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     if (!customer || !customer.length) {
-//       fetchData();
-//     } else {
-//       setCustomer(customer);
-//       setIsEdit(false);
-//     }
-//   }, [customer]);
-
-//   // useEffect(() => {}, [customers]);
-
-//   // useEffect(() => {
-//   //   if (!isEmpty(customers)) {
-//   //     setCustomer(customers);
-//   //     setIsEdit(false);
-//   //   }
-//   // }, [customers]);
-
-//   // Add Data
-//   const handleCustomerClicks = () => {
-//     setCustomer("");
-//     setIsEdit(false);
-//     toggle();
-//   };
-
-//   // Node API
-//   // useEffect(() => {
-//   //   if (isCustomerCreated) {
-//   //     setCustomer(null);
-//   //     dispatch(onGetCustomers());
-//   //   }
-//   // }, [
-//   //   dispatch,
-//   //   isCustomerCreated,
-//   // ]);
-
-//   const handleValidDate = (date) => {
-//     const date1 = moment(new Date(date)).format("DD MMM Y");
-//     return date1;
-//   };
-
-//   // Checked All
-//   const checkedAll = useCallback(() => {
-//     const checkall = document.getElementById("checkBoxAll");
-//     const ele = document.querySelectorAll(".customerCheckBox");
-
-//     if (checkall.checked) {
-//       ele.forEach((ele) => {
-//         ele.checked = true;
-//       });
-//     } else {
-//       ele.forEach((ele) => {
-//         ele.checked = false;
-//       });
-//     }
-//     deleteCheckbox();
-//   }, []);
-
-//   // Delete Multiple
-//   const [selectedCheckBoxDelete, setSelectedCheckBoxDelete] = useState([]);
-//   const [isMultiDeleteButton, setIsMultiDeleteButton] = useState(false);
-
-//   const deleteMultiple = () => {
-//     const checkall = document.getElementById("checkBoxAll");
-//     selectedCheckBoxDelete.forEach((element) => {
-//       dispatch(onDeleteCustomer(element.value));
-//       setTimeout(() => {
-//         toast.clearWaitingQueue();
-//       }, 3000);
-//     });
-//     setIsMultiDeleteButton(false);
-//     checkall.checked = false;
-//   };
-
-//   const deleteCheckbox = () => {
-//     const ele = document.querySelectorAll(".customerCheckBox:checked");
-//     ele.length > 0
-//       ? setIsMultiDeleteButton(true)
-//       : setIsMultiDeleteButton(false);
-//     setSelectedCheckBoxDelete(ele);
-//   };
-
-//   // Customers Column
-//   const columns = useMemo(
-//     () => [
-//       {
-//         Header: (
-//           <input
-//             type="checkbox"
-//             className="form-check-input"
-//             id="checkBoxAll"
-//             onClick={() => checkedAll()}
-//           />
-//         ),
-//         Cell: (cellProps) => {
-//           return (
-//             <input
-//               type="checkbox"
-//               className="customerCheckBox form-check-input"
-//               value={cellProps.row.original._id}
-//               onChange={() => deleteCheckbox()}
-//             />
-//           );
-//         },
-//         id: "#",
-//       },
-//       {
-//         Header: "",
-//         accessor: "id",
-//         hiddenColumns: true,
-//         Cell: (cell) => {
-//           return <input type="hidden" value={cell.value} />;
-//         },
-//       },
-//       {
-//         Header: "Customer",
-//         accessor: "customer",
-//         filterable: false,
-//       },
-//       {
-//         Header: "Email",
-//         accessor: "email",
-//         filterable: false,
-//       },
-//       {
-//         Header: "Phone",
-//         accessor: "phone",
-//         filterable: false,
-//       },
-//       {
-//         Header: "Date",
-//         accessor: "date",
-//         filterable: false,
-//         Cell: (cell) => <>{handleValidDate(cell.value)}</>,
-//       },
-//       {
-//         Header: "Status",
-//         accessor: "status",
-//         Cell: (cell) => {
-//           switch (cell.value) {
-//             case "Active":
-//               return (
-//                 <span className="badge text-uppercase badge-soft-success">
-//                   {" "}
-//                   {cell.value}{" "}
-//                 </span>
-//               );
-//             case "Block":
-//               return (
-//                 <span className="badge text-uppercase badge-soft-danger">
-//                   {" "}
-//                   {cell.value}{" "}
-//                 </span>
-//               );
-//             default:
-//               return (
-//                 <span className="badge text-uppercase badge-soft-info">
-//                   {" "}
-//                   {cell.value}{" "}
-//                 </span>
-//               );
-//           }
-//         },
-//       },
-//       {
-//         Header: "Action",
-//         Cell: (cellProps) => {
-//           return (
-//             <ul className="list-inline hstack gap-2 mb-0">
-//               <li className="list-inline-item edit" title="Edit">
-//                 <Link
-//                   to="#"
-//                   className="text-primary d-inline-block edit-item-btn"
-//                   onClick={() => {
-//                     const customerData = cellProps.row.original;
-//                     handleCustomerClick(customerData);
-//                   }}
-//                 >
-//                   <i className="ri-pencil-fill fs-16"></i>
-//                 </Link>
-//               </li>
-//               <li className="list-inline-item" title="Remove">
-//                 <Link
-//                   to="#"
-//                   className="text-danger d-inline-block remove-item-btn"
-//                   onClick={() => {
-//                     const customerData = cellProps.row.original;
-//                     onClickDelete(customerData);
-//                   }}
-//                 >
-//                   <i className="ri-delete-bin-5-fill fs-16"></i>
-//                 </Link>
-//               </li>
-//             </ul>
-//           );
-//         },
-//       },
-//     ],
-//     [handleCustomerClick, checkedAll]
-//   );
-
-//   const dateFormat = () => {
-//     let d = new Date(),
-//       months = [
-//         "Jan",
-//         "Feb",
-//         "Mar",
-//         "Apr",
-//         "May",
-//         "Jun",
-//         "Jul",
-//         "Aug",
-//         "Sep",
-//         "Oct",
-//         "Nov",
-//         "Dec",
-//       ];
-//     return (
-//       d.getDate() +
-//       " " +
-//       months[d.getMonth()] +
-//       ", " +
-//       d.getFullYear()
-//     ).toString();
-//   };
-
-//   const [date, setDate] = useState(dateFormat());
-
-//   const dateformate = (e) => {
-//     const date = e.toString().split(" ");
-//     const joinDate = (date[2] + " " + date[1] + ", " + date[3]).toString();
-//     setDate(joinDate);
-//   };
-
-//   // Export Modal
-//   const [isExportCSV, setIsExportCSV] = useState(false);
-
-//   document.title = "Customers | Velzon - React Admin & Dashboard Template";
-//   return (
-//     // <React.Fragment>
-//     //   <div className="page-content">
-//     //     <ExportCSVModal
-//     //       show={isExportCSV}
-//     //       onCloseClick={() => setIsExportCSV(false)}
-//     //       data={customer}
-//     //     />
-//     //     <DeleteModal
-//     //       show={deleteModal}
-//     //       onDeleteClick={handleDeleteCustomer}
-//     //       onCloseClick={() => setDeleteModal(false)}
-//     //     />
-//     //     <DeleteModal
-//     //       show={deleteModalMulti}
-//     //       onDeleteClick={() => {
-//     //         deleteMultiple();
-//     //         setDeleteModalMulti(false);
-//     //       }}
-//     //       onCloseClick={() => setDeleteModalMulti(false)}
-//     //     />
-//     //     <Container fluid>
-//     //       <BreadCrumb title="Customers" pageTitle="Ecommerce" />
-//     //       <Row>
-//     //         <Col lg={12}>
-//     //           <Card id="customerList">
-//     //             <CardHeader className="border-0">
-//     //               <Row className="g-4 align-items-center">
-//     //                 <div className="col-sm">
-//     //                   <div>
-//     //                     <h5 className="card-title mb-0">Customer List</h5>
-//     //                   </div>
-//     //                 </div>
-//     //                 <div className="col-sm-auto">
-//     //                   <div className="d-flex flex-wrap align-items-start gap-2">
-//     //                     {isMultiDeleteButton && (
-//     //                       <button
-//     //                         className="btn btn-soft-danger me-1"
-//     //                         id="remove-actions"
-//     //                         onClick={() => setDeleteModalMulti(true)}
-//     //                       >
-//     //                         <i className="ri-delete-bin-2-line"></i>
-//     //                       </button>
-//     //                     )}
-//     //                     <button
-//     //                       type="button"
-//     //                       className="btn btn-primary add-btn"
-//     //                       id="create-btn"
-//     //                       onClick={() => {
-//     //                         setIsEdit(false);
-//     //                         toggle();
-//     //                       }}
-//     //                     >
-//     //                       <i className="ri-add-line align-bottom me-1"></i> Add
-//     //                       Customer
-//     //                     </button>{" "}
-//     //                     <button
-//     //                       type="button"
-//     //                       className="btn btn-secondary"
-//     //                       onClick={() => setIsExportCSV(true)}
-//     //                     >
-//     //                       <i className="ri-file-download-line align-bottom me-1"></i>{" "}
-//     //                       Export
-//     //                     </button>
-//     //                   </div>
-//     //                 </div>
-//     //               </Row>
-//     //             </CardHeader>
-//     //             <div className="card-body pt-0">
-//     //               <div>
-//     //                 {customer.length ? (
-//     //                   <TableContainer
-//     //                     columns={columns}
-//     //                     data={customer || []}
-//     //                     isGlobalFilter={true}
-//     //                     isAddUserList={false}
-//     //                     customPageSize={10}
-//     //                     className="custom-header-css"
-//     //                     handleCustomerClick={handleCustomerClicks}
-//     //                     isCustomerFilter={true}
-//     //                     theadClass="table-light text-muted"
-//     //                     SearchPlaceholder="Search for customer, email, phone, status or something..."
-//     //                   />
-//     //                 ) : (
-//     //                   <Loader error={error} />
-//     //                 )}
-//     //               </div>
-//     //               <Modal id="showModal" isOpen={modal} toggle={toggle} centered>
-//     //                 <ModalHeader className="bg-light p-3" toggle={toggle}>
-//     //                   {!!isEdit ? "Edit Customer" : "Add Customer"}
-//     //                 </ModalHeader>
-//     //                 <Form
-//     //                   className="tablelist-form"
-//     //                   onSubmit={(e) => {
-//     //                     e.preventDefault();
-//     //                     validation.handleSubmit();
-//     //                     return false;
-//     //                   }}
-//     //                 >
-//     //                   <ModalBody>
-//     //                     <input type="hidden" id="id-field" />
-
-//     //                     <div
-//     //                       className="mb-3"
-//     //                       id="modal-id"
-//     //                       style={{ display: "none" }}
-//     //                     >
-//     //                       <Label htmlFor="id-field1" className="form-label">
-//     //                         ID
-//     //                       </Label>
-//     //                       <Input
-//     //                         type="text"
-//     //                         id="id-field1"
-//     //                         className="form-control"
-//     //                         placeholder="ID"
-//     //                         readOnly
-//     //                       />
-//     //                     </div>
-
-//     //                     <div className="mb-3">
-//     //                       <Label
-//     //                         htmlFor="customername-field"
-//     //                         className="form-label"
-//     //                       >
-//     //                         Customer Name
-//     //                       </Label>
-//     //                       <Input
-//     //                         name="customer"
-//     //                         id="customername-field"
-//     //                         className="form-control"
-//     //                         placeholder="Enter Name"
-//     //                         type="text"
-//     //                         validate={{
-//     //                           required: { value: true },
-//     //                         }}
-//     //                         onChange={validation.handleChange}
-//     //                         onBlur={validation.handleBlur}
-//     //                         value={validation.values.customer || ""}
-//     //                         invalid={
-//     //                           validation.touched.customer &&
-//     //                           validation.errors.customer
-//     //                             ? true
-//     //                             : false
-//     //                         }
-//     //                       />
-//     //                       {validation.touched.customer &&
-//     //                       validation.errors.customer ? (
-//     //                         <FormFeedback type="invalid">
-//     //                           {validation.errors.customer}
-//     //                         </FormFeedback>
-//     //                       ) : null}
-//     //                     </div>
-
-//     //                     <div className="mb-3">
-//     //                       <Label htmlFor="email-field" className="form-label">
-//     //                         Email
-//     //                       </Label>
-//     //                       <Input
-//     //                         name="email"
-//     //                         type="email"
-//     //                         id="email-field"
-//     //                         placeholder="Enter Email"
-//     //                         onChange={validation.handleChange}
-//     //                         onBlur={validation.handleBlur}
-//     //                         value={validation.values.email || ""}
-//     //                         invalid={
-//     //                           validation.touched.email &&
-//     //                           validation.errors.email
-//     //                             ? true
-//     //                             : false
-//     //                         }
-//     //                       />
-//     //                       {validation.touched.email &&
-//     //                       validation.errors.email ? (
-//     //                         <FormFeedback type="invalid">
-//     //                           {validation.errors.email}
-//     //                         </FormFeedback>
-//     //                       ) : null}
-//     //                     </div>
-
-//     //                     <div className="mb-3">
-//     //                       <Label htmlFor="phone-field" className="form-label">
-//     //                         Phone
-//     //                       </Label>
-//     //                       <Input
-//     //                         name="phone"
-//     //                         type="text"
-//     //                         id="phone-field"
-//     //                         placeholder="Enter Phone no."
-//     //                         onChange={validation.handleChange}
-//     //                         onBlur={validation.handleBlur}
-//     //                         value={validation.values.phone || ""}
-//     //                         invalid={
-//     //                           validation.touched.phone &&
-//     //                           validation.errors.phone
-//     //                             ? true
-//     //                             : false
-//     //                         }
-//     //                       />
-//     //                       {validation.touched.phone &&
-//     //                       validation.errors.phone ? (
-//     //                         <FormFeedback type="invalid">
-//     //                           {validation.errors.phone}
-//     //                         </FormFeedback>
-//     //                       ) : null}
-//     //                     </div>
-
-//     //                     <div className="mb-3">
-//     //                       <Label htmlFor="date-field" className="form-label">
-//     //                         Joining Date
-//     //                       </Label>
-
-//     //                       <Flatpickr
-//     //                         name="date"
-//     //                         id="date-field"
-//     //                         className="form-control"
-//     //                         placeholder="Select a date"
-//     //                         options={{
-//     //                           altInput: true,
-//     //                           altFormat: "d M, Y",
-//     //                           dateFormat: "d M, Y",
-//     //                         }}
-//     //                         onChange={(e) => dateformate(e)}
-//     //                         value={validation.values.date || ""}
-//     //                       />
-//     //                       {validation.touched.date && validation.errors.date ? (
-//     //                         <FormFeedback type="invalid">
-//     //                           {validation.errors.date}
-//     //                         </FormFeedback>
-//     //                       ) : null}
-//     //                     </div>
-
-//     //                     <div>
-//     //                       <Label htmlFor="status-field" className="form-label">
-//     //                         Status
-//     //                       </Label>
-
-//     //                       <Input
-//     //                         name="status"
-//     //                         type="select"
-//     //                         className="form-select"
-//     //                         id="status-field"
-//     //                         onChange={validation.handleChange}
-//     //                         onBlur={validation.handleBlur}
-//     //                         value={validation.values.status || ""}
-//     //                       >
-//     //                         {customermocalstatus.map((item, key) => (
-//     //                           <React.Fragment key={key}>
-//     //                             {item.options.map((item, key) => (
-//     //                               <option value={item.value} key={key}>
-//     //                                 {item.label}
-//     //                               </option>
-//     //                             ))}
-//     //                           </React.Fragment>
-//     //                         ))}
-//     //                       </Input>
-//     //                       {validation.touched.status &&
-//     //                       validation.errors.status ? (
-//     //                         <FormFeedback type="invalid">
-//     //                           {validation.errors.status}
-//     //                         </FormFeedback>
-//     //                       ) : null}
-//     //                     </div>
-//     //                   </ModalBody>
-//     //                   <ModalFooter>
-//     //                     <div className="hstack gap-2 justify-content-end">
-//     //                       <button
-//     //                         type="button"
-//     //                         className="btn btn-light"
-//     //                         onClick={() => {
-//     //                           setModal(false);
-//     //                         }}
-//     //                       >
-//     //                         {" "}
-//     //                         Close{" "}
-//     //                       </button>
-
-//     //                       <button type="submit" className="btn btn-success">
-//     //                         {" "}
-//     //                         {!!isEdit ? "Update" : "Add Customer"}{" "}
-//     //                       </button>
-//     //                     </div>
-//     //                   </ModalFooter>
-//     //                 </Form>
-//     //               </Modal>
-//     //               <ToastContainer closeButton={false} limit={1} />
-//     //             </div>
-//     //           </Card>
-//     //         </Col>
-//     //       </Row>
-//     //     </Container>
-//     //   </div>
-//     // </React.Fragment>
-//     <div></div>
-//   );
-// };
-
-// export default EcommerceCustomers;
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -741,44 +9,327 @@ import {
   TableRow,
   Paper,
   IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  TextField,
 } from "@mui/material";
-import { CheckCircleOutline, CancelOutlined } from "@mui/icons-material";
+import {
+  CheckCircleOutline,
+  CancelOutlined,
+  Delete,
+  Update,
+  CreateSharp,
+  ArrowLeft,
+  ArrowRight,
+} from "@mui/icons-material";
 const EcommerceCustomers = () => {
   const [customers, setCustomers] = useState([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [isUpdateDialogOpen, setUpdateDialogOpen] = useState(false);
+
+  const [updatedCustomer, setUpdatedCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    // validAccount: true,
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     // Fetch data from your API when the component mounts
     axios
-      .get("http://localhost:4000/v1/customers")
+      .get("http://localhost:4000/v1/customers", {
+        params: {
+          sort: "DESC",
+        },
+      })
       .then((response) => {
-        console.log(response.customers);
-        setCustomers(response.customers);
+        const allCustomers = response.customers;
+        const startIndex = (currentPage - 1) * 10;
+        const endIndex = startIndex + 10;
+        const customersForCurrentPage = allCustomers.slice(
+          startIndex,
+          endIndex
+        );
+        setCustomers(customersForCurrentPage);
+        const pages = (prev) =>
+          prev > Math.ceil(allCustomers.length / 10)
+            ? prev
+            : Math.ceil(allCustomers.length / 10);
+        setTotalPages(pages);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []); // Empty dependency array ensures the effect runs once when the component mounts
+  }, [currentPage]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   // Format the last login date
   const formatLastLogin = (lastLogin) => {
-    // Add your formatting logic here
-    // Example: return new Date(lastLogin).toLocaleString();
-    return lastLogin;
+    const date = new Date(lastLogin);
+
+    // Get day, month, and year
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Month is zero-based, so add 1
+    const year = date.getFullYear();
+
+    // Format as "day/month/year"
+    const formattedDate = `${day}/${month}/${year}`;
+
+    return formattedDate;
+  };
+
+  //delete user
+  const openDeleteDialog = (userId) => {
+    setSelectedCustomerId(userId);
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setSelectedCustomerId(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const confirmDeleteCustomer = async () => {
+    try {
+      // Perform the deletion logic using axios or any other method
+      await axios.delete(
+        `http://localhost:4000/v1/customers/${selectedCustomerId}`
+      );
+      // Fetch
+      const customerResponse = await axios.get(
+        "http://localhost:4000/v1/customers",
+        {
+          params: {
+            sort: "DESC",
+          },
+        }
+      );
+      const allCustomers = customerResponse.customers;
+      const startIndex = (currentPage - 1) * 10;
+      const endIndex = startIndex + 10;
+      const customersForCurrentPage = allCustomers.slice(startIndex, endIndex);
+      setCustomers(customersForCurrentPage);
+      const pages = (prev) =>
+        prev > Math.ceil(allCustomers.length / 10)
+          ? prev
+          : Math.ceil(allCustomers.length / 10);
+      setTotalPages(pages);
+      closeDeleteDialog();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  //update
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedCustomer((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
+  };
+
+  const openUpdateDialog = (userId) => {
+    setSelectedCustomerId(userId);
+    setUpdateDialogOpen(true);
+  };
+
+  const closeUpdateDialog = () => {
+    setSelectedCustomerId(null);
+    setUpdateDialogOpen(false);
+  };
+
+  const confirmUpdateCustomer = async () => {
+    try {
+      await axios.put(
+        `http://localhost:4000/v1/customers/${selectedCustomerId}`,
+        updatedCustomer
+      );
+
+      // Fetch updated data
+      const customerResponse = await axios.get(
+        "http://localhost:4000/v1/customers",
+        {
+          params: {
+            sort: "DESC",
+          },
+        }
+      );
+      const allCustomers = customerResponse.customers;
+      const startIndex = (currentPage - 1) * 10;
+      const endIndex = startIndex + 10;
+      const customersForCurrentPage = allCustomers.slice(startIndex, endIndex);
+      setCustomers(customersForCurrentPage);
+      const pages = (prev) =>
+        prev > Math.ceil(allCustomers.length / 10)
+          ? prev
+          : Math.ceil(allCustomers.length / 10);
+      setTotalPages(pages);
+
+      // Close the update confirmation dialog
+      closeUpdateDialog();
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  //Search
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      userSearch();
+    }
+  };
+
+  const userSearch = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/v1/customers/search",
+        {
+          params: {
+            query: searchQuery,
+            page: currentPage, // Assuming you have currentPage in your state
+            sort: "DESC", // Change as needed
+          },
+        }
+      );
+
+      const allCustomers = response.customers;
+      const startIndex = (currentPage - 1) * 10;
+      const endIndex = startIndex + 10;
+      const usersForCurrentPage = allCustomers.slice(startIndex, endIndex);
+
+      setCustomers(usersForCurrentPage);
+      const pages = (prev) =>
+        prev > Math.ceil(allCustomers.length / 10)
+          ? prev
+          : Math.ceil(allCustomers.length / 10);
+      setTotalPages(pages);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
   };
 
   return (
-    <div style={{ marginTop: "50px", padding: "50px" }}>
+    <div style={{ marginTop: "50px", padding: "80px" }}>
       <h1>Customer List</h1>
+
+      <TextField
+        label="Search"
+        value={searchQuery}
+        onChange={handleSearchChange}
+        onKeyPress={handleSearchKeyPress}
+        style={{ marginBottom: "10px" }}
+      />
+
+      {/* update dialog */}
+      <Dialog open={isUpdateDialogOpen} onClose={closeUpdateDialog} fullWidth>
+        <DialogTitle style={{ height: "auto" }}>
+          <h2
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#cccccc",
+              borderRadius: "5px",
+            }}
+          >
+            {" "}
+            Update User
+          </h2>
+        </DialogTitle>
+        <DialogContent
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "auto",
+            overflowY: "auto",
+          }}
+        >
+          <TextField
+            label="First Name"
+            name="firstName"
+            value={updatedCustomer.firstName}
+            onChange={handleInputChange}
+            style={{ marginBottom: "5px", marginTop: "5px" }}
+          />
+          <TextField
+            label="Last Name"
+            name="lastName"
+            value={updatedCustomer.lastName}
+            onChange={handleInputChange}
+            style={{ marginBottom: "5px" }}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={updatedCustomer.email}
+            onChange={handleInputChange}
+            style={{ marginBottom: "5px" }}
+          />
+          {/* Add more fields as needed */}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={confirmUpdateCustomer}
+            variant="contained"
+            style={{ backgroundColor: "#7758ae", color: "#fff" }}
+          >
+            Update
+          </Button>
+          <Button onClick={closeUpdateDialog} variant="contained" color="error">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* delete  */}
+      <Dialog open={isDeleteDialogOpen} onClose={closeDeleteDialog}>
+        <DialogTitle>Delete User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this user?
+            <br /> id : {selectedCustomerId}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog} color="error">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteCustomer} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>last Login</TableCell>
-              <TableCell>Is valid</TableCell>
-              <TableCell>Active</TableCell>
+              <TableCell style={{ fontWeight: 800 }}>First Name</TableCell>
+              <TableCell style={{ fontWeight: 800 }}>Last Name </TableCell>
+              <TableCell style={{ fontWeight: 800 }}>Email</TableCell>
+              <TableCell style={{ fontWeight: 800 }}>last Login</TableCell>
+              <TableCell style={{ fontWeight: 800 }}>Is valid</TableCell>
+              <TableCell style={{ fontWeight: 800 }}>Active</TableCell>
               {/* Add more table headers for other fields */}
             </TableRow>
           </TableHead>
@@ -791,7 +342,7 @@ const EcommerceCustomers = () => {
                 <TableCell>{formatLastLogin(customer.lastLogin)}</TableCell>
                 <TableCell>
                   {customer.validAccount ? (
-                    <IconButton color="primary">
+                    <IconButton color="secondary">
                       <CheckCircleOutline />
                     </IconButton>
                   ) : (
@@ -800,13 +351,48 @@ const EcommerceCustomers = () => {
                     </IconButton>
                   )}
                 </TableCell>
-                <TableCell>{customer.active}</TableCell>
-                {/* Add more table cells for other fields */}
+                <TableCell>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => openUpdateDialog(customer._id)}
+                  >
+                    <CreateSharp />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => openDeleteDialog(customer._id)} // handleDeleteDialogDelete
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Pagination Controls */}
+      <div style={{ marginTop: "20px" }}>
+        <Button
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+          variant="contained"
+          style={{ backgroundColor: "#7758ae", color: "#fff" }}
+        >
+          <ArrowLeft />
+        </Button>
+
+        <span style={{ margin: "0 10px" }}>
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <Button
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+          style={{ backgroundColor: "#7758ae", color: "#fff" }}
+        >
+          <ArrowRight />
+        </Button>
+      </div>
     </div>
   );
 };

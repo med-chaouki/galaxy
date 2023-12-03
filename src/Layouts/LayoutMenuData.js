@@ -35,6 +35,12 @@ const Navdata = () => {
       icon: "ri-dashboard-2-line",
     },
     {
+      id: 8,
+      label: "Users",
+      link: "/apps-ecommerce-users",
+      icon: "ri-dashboard-2-line",
+    },
+    {
       id: 9,
       label: "Sellers",
       link: "/apps-ecommerce-sellers",
