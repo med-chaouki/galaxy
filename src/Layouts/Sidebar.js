@@ -11,7 +11,6 @@ import { Container } from "reactstrap";
 import HorizontalLayout from "./HorizontalLayout";
 
 const Sidebar = ({ layoutType }) => {
-
   useEffect(() => {
     var verticalOverlay = document.getElementsByClassName("vertical-overlay");
     if (verticalOverlay) {
@@ -23,12 +22,20 @@ const Sidebar = ({ layoutType }) => {
 
   const addEventListenerOnSmHoverMenu = () => {
     // add listener Sidebar Hover icon on change layout from setting
-    if (document.documentElement.getAttribute('data-sidebar-size') === 'sm-hover') {
-      document.documentElement.setAttribute('data-sidebar-size', 'sm-hover-active');
-    } else if (document.documentElement.getAttribute('data-sidebar-size') === 'sm-hover-active') {
-      document.documentElement.setAttribute('data-sidebar-size', 'sm-hover');
+    if (
+      document.documentElement.getAttribute("data-sidebar-size") === "sm-hover"
+    ) {
+      document.documentElement.setAttribute(
+        "data-sidebar-size",
+        "sm-hover-active"
+      );
+    } else if (
+      document.documentElement.getAttribute("data-sidebar-size") ===
+      "sm-hover-active"
+    ) {
+      document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
     } else {
-      document.documentElement.setAttribute('data-sidebar-size', 'sm-hover');
+      document.documentElement.setAttribute("data-sidebar-size", "sm-hover");
     }
   };
 
@@ -36,23 +43,6 @@ const Sidebar = ({ layoutType }) => {
     <React.Fragment>
       <div className="app-menu navbar-menu border-end">
         <div className="navbar-brand-box">
-          <Link to="/" className="logo logo-dark">
-            <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
-            </span>
-            <span className="logo-lg">
-              <img src={logoDark} alt="" height="17" />
-            </span>
-          </Link>
-
-          <Link to="/" className="logo logo-light">
-            <span className="logo-sm">
-              <img src={logoSm} alt="" height="22" />
-            </span>
-            <span className="logo-lg">
-              <img src={logoLight} alt="" height="17" />
-            </span>
-          </Link>
           <button
             onClick={addEventListenerOnSmHoverMenu}
             type="button"
@@ -62,14 +52,14 @@ const Sidebar = ({ layoutType }) => {
             <i className="ri-record-circle-line"></i>
           </button>
         </div>
-          <div id="scrollbar">
-            <Container fluid>
-              <div id="two-column-menu"></div>
-              <ul className="navbar-nav" id="navbar-nav">
-                <HorizontalLayout />
-              </ul>
-            </Container>
-          </div>
+        <div id="scrollbar">
+          <Container fluid>
+            <div id="two-column-menu"></div>
+            <ul className="navbar-nav" id="navbar-nav">
+              <HorizontalLayout />
+            </ul>
+          </Container>
+        </div>
       </div>
       <div className="vertical-overlay"></div>
     </React.Fragment>

@@ -26,6 +26,8 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "@mui/icons-material";
+import DeleteModal from "../../../Components/Common/DeleteModal";
+
 const EcommerceCustomers = () => {
   const [customers, setCustomers] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -44,6 +46,8 @@ const EcommerceCustomers = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
     // Fetch data from your API when the component mounts
@@ -147,6 +151,12 @@ const EcommerceCustomers = () => {
   const openUpdateDialog = (userId) => {
     setSelectedCustomerId(userId);
     setUpdateDialogOpen(true);
+
+    const customerToUpdate = customers.find((user) => user._id === userId);
+
+    setSelectedCustomer(customerToUpdate);
+
+    setUpdatedCustomer(customerToUpdate);
   };
 
   const closeUpdateDialog = () => {
@@ -248,12 +258,12 @@ const EcommerceCustomers = () => {
             style={{
               width: "100%",
               padding: "10px",
-              backgroundColor: "#cccccc",
+              backgroundColor: "#7758ae",
+              color: "#fff",
               borderRadius: "5px",
             }}
           >
-            {" "}
-            Update User
+            Update Customer
           </h2>
         </DialogTitle>
         <DialogContent
@@ -263,27 +273,28 @@ const EcommerceCustomers = () => {
             height: "auto",
             overflowY: "auto",
           }}
+          value={selectedCustomer ? selectedCustomer : ""}
         >
           <TextField
             label="First Name"
             name="firstName"
             value={updatedCustomer.firstName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px", marginTop: "5px" }}
+            style={{ marginBottom: "10px", marginTop: "10px" }}
           />
           <TextField
             label="Last Name"
             name="lastName"
             value={updatedCustomer.lastName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Email"
             name="email"
             value={updatedCustomer.email}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           {/* Add more fields as needed */}
         </DialogContent>
@@ -302,7 +313,7 @@ const EcommerceCustomers = () => {
       </Dialog>
 
       {/* delete  */}
-      <Dialog open={isDeleteDialogOpen} onClose={closeDeleteDialog}>
+      {/* <Dialog open={isDeleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Delete User</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -318,18 +329,72 @@ const EcommerceCustomers = () => {
             Delete
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+
+      <DeleteModal
+        show={isDeleteDialogOpen}
+        onDeleteClick={confirmDeleteCustomer}
+        onCloseClick={() => closeDeleteDialog(false)}
+      />
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: 800 }}>First Name</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Last Name </TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Email</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>last Login</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Is valid</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Active</TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                First Name
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Last Name{" "}
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Email
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                last Login
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Is valid
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Active
+              </TableCell>
               {/* Add more table headers for other fields */}
             </TableRow>
           </TableHead>
@@ -339,7 +404,11 @@ const EcommerceCustomers = () => {
                 <TableCell>{customer.firstName}</TableCell>
                 <TableCell>{customer.lastName}</TableCell>
                 <TableCell>{customer.email}</TableCell>
-                <TableCell>{formatLastLogin(customer.lastLogin)}</TableCell>
+                <TableCell>
+                  {customer.lastLogin === null
+                    ? formatLastLogin(customer.updatedAt)
+                    : formatLastLogin(customer.lastLogin)}
+                </TableCell>
                 <TableCell>
                   {customer.validAccount ? (
                     <IconButton color="secondary">

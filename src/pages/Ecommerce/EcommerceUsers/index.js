@@ -30,8 +30,9 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "@mui/icons-material";
+import DeleteModal from "../../../Components/Common/DeleteModal";
 
-const EcommerceUsers = () => {
+const EcommerceUsers = ({ show, onDeleteClick, onCloseClick }) => {
   const [users, setUsers] = useState([]);
   const [newUser, setNewUser] = useState({
     firstName: "",
@@ -53,6 +54,8 @@ const EcommerceUsers = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const openAddUserModal = () => {
     setAddUserModalOpen(true);
@@ -151,6 +154,12 @@ const EcommerceUsers = () => {
   const openUpdateUserModal = (userId) => {
     setSelectedUserId(userId);
     setUpdateUserModalOpen(true);
+
+    const userToUpdate = users.find((user) => user._id === userId);
+
+    setSelectedUser(userToUpdate);
+
+    setNewUser(userToUpdate);
   };
 
   const closeUpdateUserModal = () => {
@@ -314,7 +323,8 @@ const EcommerceUsers = () => {
             style={{
               width: "100%",
               padding: "10px",
-              backgroundColor: "#cccccc",
+              backgroundColor: "#7758ae",
+              color: "#fff",
               borderRadius: "5px",
             }}
           >
@@ -334,28 +344,28 @@ const EcommerceUsers = () => {
             name="firstName"
             value={newUser.firstName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px", marginTop: "5px" }}
+            style={{ marginBottom: "10px", marginTop: "10px" }}
           />
           <TextField
             label="Last Name"
             name="lastName"
             value={newUser.lastName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Email"
             name="email"
             value={newUser.email}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Username"
             name="userName"
             value={newUser.userName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Password"
@@ -363,7 +373,7 @@ const EcommerceUsers = () => {
             type="password"
             value={newUser.password}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Role"
@@ -371,7 +381,7 @@ const EcommerceUsers = () => {
             select
             value={newUser.role}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           >
             {["admin", "manager"].map((option) => (
               <MenuItem key={option} value={option}>
@@ -409,7 +419,8 @@ const EcommerceUsers = () => {
             style={{
               width: "100%",
               padding: "10px",
-              backgroundColor: "#cccccc",
+              backgroundColor: "#7758ae",
+              color: "#fff",
               borderRadius: "5px",
             }}
           >
@@ -423,34 +434,35 @@ const EcommerceUsers = () => {
             height: "auto",
             overflowY: "auto",
           }}
+          value={selectedUser ? selectedUser : ""}
         >
           <TextField
             label="First Name"
             name="firstName"
             value={newUser.firstName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px", marginTop: "5px" }}
+            style={{ marginBottom: "10px", marginTop: "10px" }}
           />
           <TextField
             label="Last Name"
             name="lastName"
             value={newUser.lastName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Email"
             name="email"
             value={newUser.email}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Username"
             name="userName"
             value={newUser.userName}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           />
           <TextField
             label="Role"
@@ -458,7 +470,7 @@ const EcommerceUsers = () => {
             select
             value={newUser.role}
             onChange={handleInputChange}
-            style={{ marginBottom: "5px" }}
+            style={{ marginBottom: "10px" }}
           >
             {["admin", "manager"].map((option) => (
               <MenuItem key={option} value={option}>
@@ -486,7 +498,7 @@ const EcommerceUsers = () => {
       </Dialog>
 
       {/* delete  */}
-      <Dialog open={isDeleteDialogOpen} onClose={closeDeleteDialog}>
+      {/* <Dialog open={isDeleteDialogOpen} onClose={closeDeleteDialog}>
         <DialogTitle>Delete User</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -502,17 +514,72 @@ const EcommerceUsers = () => {
             Delete
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+
+      <DeleteModal
+        show={isDeleteDialogOpen}
+        onDeleteClick={confirmDeleteUser}
+        onCloseClick={() => closeDeleteDialog(false)}
+      />
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: 800 }}>First Name</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Last Name </TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Email</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>last Login</TableCell>
-              <TableCell style={{ fontWeight: 800 }}>Active</TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                First Name
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Last Name{" "}
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Email
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Role
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                last Login
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#495057",
+                  fontFamily: "Saira, sans-serif",
+                  fontWeight: 800,
+                }}
+              >
+                Active
+              </TableCell>
               {/* Add more table headers for other fields */}
             </TableRow>
           </TableHead>
